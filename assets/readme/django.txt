@@ -1,0 +1,848 @@
+# Django Project Setup Guide
+---
+## Table of Contents
+1. [Setting Up the Environment](#setting-up-the-environment)
+   - [1.1 Virtual Environment](#1-virtual-environment)
+   - [1.2 Install Django and Dependencies](#2-install-django-and-dependencies)
+   - [1.3 MySQL Client Installation](#3-mysql-client-installation)
+   - [1.4 Freeze Requirements](#4-freeze-requirements)
+   
+2. [Starting a Django Project](#starting-a-django-project)
+   - [2.1 Create a New Project](#1-create-a-new-project)
+   - [2.2 Create a New App](#2-create-a-new-app)
+
+3. [Static File Management](#static-file-management)
+   - [3.1 Static and Media Files](#1-static-and-media-files)
+      - [3.1.1 Static Files](#a-static-files)
+      - [3.1.2 Media Files](#b-media-files)
+   - [3.2 Collect Static Files](#2-collect-static-files)
+   - [3.3 CSS and JS Caching Issue](#3-css-and-js-caching-issue)
+
+4. [Integrating CSS Frameworks](#integrating-css-frameworks)
+   - [4.1 Bootstrap](#1-bootstrap)
+   - [4.2 Tailwind CSS](#2-tailwind-css)
+
+5. [Authentication Setup](#authentication-setup)
+   - [5.1 Django Allauth](#1-django-allauth)
+
+6. [Queues and Background Jobs](#queues-and-background-jobs)
+   - [6.1 Celery and Redis](#1-celery-and-redis)
+
+7. [Testing](#testing)
+
+8. [QR Code Generation & Manipulation](#12-qr-code-generation--manipulation)
+   - [8.1 QR Code Generation](#a-qr-code-generation)
+   - [8.2 QR Manipulation](#b-qr-manipulation)
+
+9. [Model Setup & Relationships](#13-model-setup--relationships)
+
+10. [Form Creation and Methods](#14-form-creation-and-methods)
+
+11. [Social Authentication (Socialite Integration)](#15-social-authentication-socialite-integration)
+
+12. [Multi-Language Project Setup](#16-multi-language-project-setup)
+
+13. [Integrating AI Features](#17-integrating-ai-features)
+
+14. [Deployment](#deployment)
+
+15. [Django RESTful API Management](#django-restful-api-management)
+    - [15.1 Prerequisites](#prerequisites)
+    - [15.2 Basic API Setup](#basic-api-setup)
+    - [15.3 Using Viewsets and Routers](#using-viewsets-and-routers)
+    - [15.4 Authentication and Permissions](#authentication-and-permissions)
+    - [15.5 Advanced Topics](#advanced-topics)
+
+16. [Deployment (API)](#deployment-1)
+---
+## Setting Up the Environment
+
+### 1. Virtual Environment
+- Create a virtual environment:
+  ```bash
+  python -m venv venv
+  ```
+- Activate the virtual environment:
+  - On Windows:
+    ```bash
+    venv\Scripts\activate
+    ```
+  - On macOS/Linux:
+    ```bash
+    source venv/bin/activate
+    ```
+
+### 2. Install Django and Dependencies
+- Install Django:
+  ```bash
+  pip install django
+  ```
+
+### 3. MySQL Client Installation
+- Install the MySQL client:
+  ```bash
+  pip install mysqlclient
+  ```
+  ```setting.py
+  DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'college_project',
+        'USER' : 'root',
+        'PASSWORD' : '',
+        'HOST' : 'localhost',
+        'PORT' : '3306',
+    }
+}
+  ```
+
+### 4. Freeze Requirements
+- Freeze dependencies:
+  ```bash
+  pip freeze > requirements.txt
+  ```
+- Use the requirements file:
+  ```bash
+  pip install -r requirements.txt
+  ```
+
+## Starting a Django Project
+
+### 1. Create a New Project
+- Start a project:
+  ```bash
+  django-admin startproject project_name
+  ```
+
+### 2. Create a New App
+- Create an app:
+  ```bash
+  python manage.py startapp app_name
+  ```
+- Add the app to `INSTALLED_APPS` in `settings.py`.
+
+
+## Static File Management
+### 1 Static and Media Files
+
+### a. Static Files
+Configure static files in `settings.py`:
+```python
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+```
+
+Collect static files:
+```bash
+python manage.py collectstatic
+```
+
+### b. Media Files
+Set up media files in `settings.py`:
+```python
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+```
+
+Update `urls.py` to serve media files during development:
+```python
+from django.conf import settings
+from django.conf.urls.static import static
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+### 2. Collect Static Files
+- Collect static files:
+  ```bash
+  python manage.py collectstatic
+  ```
+
+### 3. CSS and JS Caching Issue
+- Use `{% static %}` with a version parameter:
+  ```html
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.0">
+  ```
+- Enable Django’s static file versioning:
+  ```python
+  STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+  ```
+
+## Integrating CSS Frameworks
+
+### 1. Bootstrap
+- Install Django Bootstrap:
+  ```bash
+  pip install django-bootstrap-v5
+  ```
+- Add Inside .html
+  ```html
+  {% load bootstrap5 %}
+  {% bootstrap_css %}
+  {% bootstrap_javascript %}
+  ```
+- Add `'bootstrap5'` to `INSTALLED_APPS`.
+- Or, use a CDN in your base template:
+  ```html
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  ```
+
+### 2. Tailwind CSS
+
+## Installation Steps
+
+### 1. Install Tailwind CSS
+Run the following command to install Tailwind CSS:
+  ```bash
+  pip install tailwind
+  ```
+
+### 2. Add Tailwind to `INSTALLED_APPS`
+Open `settings.py` and add `'tailwind'` to the `INSTALLED_APPS` list:
+  ```python
+  INSTALLED_APPS = [
+    ...
+    'tailwind',
+    ...
+  ]
+  ```
+
+### 3. Install Django-Tailwind
+Install the `django-tailwind` package. If you need autoreload functionality, install the additional `reload` package:
+  ```bash
+  pip install django-tailwind
+  # For autoreload support:
+  pip install 'django-tailwind[reload]'
+  ```
+
+### 4. Initialize Tailwind
+Run the following command to initialize Tailwind in your project:
+  ```bash
+  python manage.py tailwind init
+  ```
+If you encounter errors due to previous installations, remove all Tailwind-related folders from `venv/lib/` and start over.
+
+### 5. Add Theme to `INSTALLED_APPS`
+Add `'theme'` (or your custom theme name) to the `INSTALLED_APPS` list in `settings.py`:
+  ```python
+  INSTALLED_APPS = [
+    ...
+    'theme',
+    ...
+  ]
+  ```
+### 6. Configure Tailwind Settings
+Add the following configurations to `settings.py`:
+  ```python
+  TAILWIND_APP_NAME = 'theme'
+  # For Windows users, specify the NPM path (run `where npm` to find it)
+  NPM_BIN_PATH = r'c:/nodejs/npm.cmd'  # Replace with your NPM path
+  ```
+
+### 7. Install Tailwind Dependencies
+Run the following command to install Tailwind dependencies:
+  ```bash
+  python manage.py tailwind install
+  ```
+
+### 8. Configure Static Files
+Add the following lines to `settings.py` to configure static files:
+  ```python
+  STATICFILES_DIRS = [BASE_DIR / 'static']
+  STATIC_ROOT = BASE_DIR / 'staticfiles'
+  ```
+
+### 9. Create Static Folder
+Create a `static` folder in the root directory of your project:
+  ```bash
+  mkdir static
+  ```
+
+### 10. Update `urls.py`
+Add the following code to the bottom of `urls.py` to serve static files during development:
+  ```python
+  from django.conf import settings
+  from django.conf.urls.static import static
+
+  if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+  ```
+
+### 11. Start Tailwind Development Server
+Run the Tailwind development server in one terminal:
+  ```bash
+  python manage.py tailwind start
+  ```
+
+### 12. Start Django Development Server
+In a separate terminal, start the Django development server:
+  ```bash
+  python manage.py runserver
+  ```
+
+### 13. Build Tailwind for Production
+When deploying to production, build Tailwind CSS using the following command:
+  ```bash
+  python manage.py tailwind build
+  ```
+
+---
+
+## Notes
+- Ensure Node.js and NPM are installed on your system.
+- Replace `'theme'` with your custom theme name if applicable.
+- For Windows users, ensure the `NPM_BIN_PATH` is correctly set to the output of `where npm`.
+
+---
+
+## Authentication Setup
+
+### 1. Django Allauth
+- Install django-allauth:
+  ```bash
+  pip install django-allauth
+  ```
+- Update `settings.py`:
+  ```python
+  INSTALLED_APPS += [
+      'allauth',
+      'allauth.account',
+      'allauth.socialaccount',
+  ]
+
+  AUTHENTICATION_BACKENDS = [
+      'django.contrib.auth.backends.ModelBackend',
+      'allauth.account.auth_backends.AuthenticationBackend',
+  ]
+
+  LOGIN_REDIRECT_URL = '/'
+  ```
+- Run migrations:
+  ```bash
+  python manage.py migrate
+  ```
+- Add Allauth URLs in `urls.py`:
+  ```python
+  from django.urls import path, include
+
+  urlpatterns = [
+      path('accounts/', include('allauth.urls')),
+  ]
+  ```
+
+## Queues and Background Jobs
+
+### 1. Celery and Redis
+- Install Celery and Redis:
+  ```bash
+  pip install celery redis
+  ```
+- Set up Celery:
+  ```python
+  from celery import Celery
+
+  app = Celery('project_name')
+  app.config_from_object('django.conf:settings', namespace='CELERY')
+  app.autodiscover_tasks()
+  ```
+- Start Celery:
+  ```bash
+  celery -A project_name worker --loglevel=info
+  ```
+- Define a task:
+  ```python
+  from celery import shared_task
+
+  @shared_task
+  def example_task():
+      return 'Task Complete'
+  ```
+- Execute the task:
+  ```python
+  example_task.delay()
+  ```
+
+## Testing
+- Run tests:
+  ```bash
+  python manage.py test
+  ```
+- Example test in `tests.py`:
+  ```python
+  from django.test import TestCase
+
+  class ExampleTest(TestCase):
+      def test_example(self):
+          self.assertEqual(1 + 1, 2)
+  ```
+## 12. QR Code Generation & Manipulation
+
+### a. QR Code Generation
+You can generate QR codes using the `qrcode` library. This is useful for encoding URLs, user information, or any other type of data into a scannable QR code.
+
+### Installation
+To install the `qrcode` library with the necessary dependencies, run:
+```bash
+pip install qrcode
+```
+
+### Example Usage
+You can generate a QR code for a URL like this:
+```python
+import qrcode
+
+# Generate QR code
+img = qrcode.make('https://example.com')
+
+# Save the generated QR code image
+img.save('qr_code.png')
+```
+
+### b. QR Manipulation
+You may want to manipulate QR code images (resize, crop, etc.) using the `Pillow` library. To install it:
+```bash
+pip install pillow
+```
+
+Example of resizing the generated QR code:
+```python
+from PIL import Image
+
+# Open the generated QR code image
+img = Image.open('qr_code.png')
+
+# Resize the image
+img = img.resize((200, 200))
+
+# Save the resized image
+img.save('resized_qr_code.png')
+```
+
+---
+
+## 13. Model Setup & Relationships
+
+Django models allow you to define the structure of your database tables. You can set up relationships between models using `ForeignKey`, `OneToOneField`, and `ManyToManyField`.
+
+### Example: Model Relationships
+
+#### ForeignKey (One-to-Many Relationship)
+A `ForeignKey` defines a one-to-many relationship. For example, each `Course` can have one `Teacher`, but a teacher can teach multiple courses:
+```python
+class Course(models.Model):
+    name = models.CharField(max_length=100)
+
+class Teacher(models.Model):
+    name = models.CharField(max_length=100)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+```
+
+#### ManyToManyField (Many-to-Many Relationship)
+A `ManyToManyField` defines a many-to-many relationship. For example, each `Teacher` can teach multiple `Course` objects:
+```python
+class Teacher(models.Model):
+    name = models.CharField(max_length=100)
+
+class Course(models.Model):
+    name = models.CharField(max_length=100)
+    teachers = models.ManyToManyField(Teacher)
+```
+
+### Admin Integration
+To customize the Django admin interface for these models, you can register them in `admin.py`:
+```python
+from django.contrib import admin
+from .models import Course, Teacher
+
+admin.site.register(Course)
+admin.site.register(Teacher)
+```
+
+---
+
+## 14. Form Creation and Methods
+
+Django provides powerful tools to handle forms, whether they are related to models (`ModelForm`) or independent forms (`Form`).
+
+### a. Django Forms
+
+#### ModelForm Example
+If you have a model like `Course`, you can create a form for it:
+```python
+from django import forms
+from .models import Course
+
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['name']
+```
+
+#### Non-Model Form Example
+For forms that are not related to any model:
+```python
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    message = forms.CharField(widget=forms.Textarea)
+```
+
+### b. Custom Form Handling
+You can override form methods like `clean` and `save` to add custom validation or save logic:
+```python
+class CourseForm(forms.ModelForm):
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if 'forbidden' in name:
+            raise forms.ValidationError('Forbidden word in course name!')
+        return name
+
+    def save(self, commit=True):
+        course = super().save(commit=False)
+        # Custom save logic here
+        if commit:
+            course.save()
+        return course
+```
+
+---
+
+## 15. Social Authentication (Socialite Integration)
+
+Social authentication allows users to sign in using their accounts from third-party services such as Google, Facebook, or GitHub.
+
+### a. Django Allauth
+
+Django Allauth supports social authentication. To install it:
+```bash
+pip install django-allauth
+```
+
+### b. Social Authentication Setup
+
+#### Add Allauth to Installed Apps
+In `settings.py`:
+```python
+INSTALLED_APPS = [
+    ...
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+]
+```
+
+#### Configure Authentication Backend
+In `settings.py`, add the following to enable Google authentication:
+```python
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+```
+
+#### Add URLs
+In `urls.py`:
+```python
+from django.urls import path, include
+
+urlpatterns = [
+    path('accounts/', include('allauth.urls')),
+]
+```
+
+#### Google OAuth Setup
+1. Obtain OAuth credentials from the [Google Developer Console](https://console.developers.google.com/).
+2. Configure them in `settings.py`:
+```python
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'your-client-id'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'your-client-secret'
+```
+
+---
+
+## 16. Multi-Language Project Setup
+
+Django supports multi-language projects through its **Internationalization (i18n)** system.
+
+### a. Enable Localization
+In `settings.py`, specify the languages your site will support:
+```python
+LANGUAGES = [
+    ('en', 'English'),
+    ('ne', 'Nepali'),
+]
+```
+
+### b. Use Translation Tags in Templates
+In templates, use `{% trans %}` to mark strings for translation:
+```html
+{% trans "Welcome to our website" %}
+```
+
+### c. Generate and Compile Translations
+Run the following commands to generate translation files and compile them:
+```bash
+django-admin makemessages -l ne
+django-admin compilemessages
+```
+
+---
+
+## 17. Integrating AI Features
+
+You can integrate AI capabilities into your Django app using external APIs or by leveraging machine learning libraries.
+
+### a. Example: Using OpenAI API
+
+Install the OpenAI library:
+```bash
+pip install openai
+```
+
+### b. Example Code to Call OpenAI API:
+```python
+import openai
+
+openai.api_key = 'your-api-key'
+
+response = openai.Completion.create(
+  model="text-davinci-003",
+  prompt="Translate the following text to French: 'Hello, how are you?'",
+  max_tokens=60
+)
+
+print(response.choices[0].text.strip())
+```
+## Deployment
+
+### 1. Gunicorn
+- Install Gunicorn:
+  ```bash
+  pip install gunicorn
+  ```
+- Run Gunicorn:
+  ```bash
+  gunicorn project_name.wsgi:application
+  ```
+
+### 2. Collect Static Files
+- Collect static files:
+  ```bash
+  python manage.py collectstatic
+  ```
+
+### 3. Configure Web Server
+- Set up Nginx, Apache, or any web server to serve your application.
+
+---
+# Django RESTful API Management
+
+## Prerequisites
+
+1. **Install Django**:
+   ```bash
+   pip install django
+   ```
+
+2. **Install Django REST Framework (DRF)**:
+   ```bash
+   pip install djangorestframework
+   ```
+
+3. **Create a Django Project**:
+   ```bash
+   django-admin startproject project_name
+   cd project_name
+   ```
+
+4. **Create a Django App**:
+   ```bash
+   python manage.py startapp app_name
+   ```
+
+5. **Add to `INSTALLED_APPS` in `settings.py`**:
+   ```python
+   INSTALLED_APPS += [
+       'rest_framework',
+       'app_name',
+   ]
+   ```
+
+---
+
+## Basic API Setup
+
+1. **Define a Model** (`models.py`):
+   ```python
+   from django.db import models
+
+   class Example(models.Model):
+       name = models.CharField(max_length=100)
+       description = models.TextField()
+   ```
+
+2. **Create and Apply Migrations**:
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
+
+3. **Create a Serializer** (`serializers.py`):
+   ```python
+   from rest_framework import serializers
+   from .models import Example
+
+   class ExampleSerializer(serializers.ModelSerializer):
+       class Meta:
+           model = Example
+           fields = '__all__'
+   ```
+
+4. **Define Views** (`views.py`):
+   ```python
+   from rest_framework.views import APIView
+   from rest_framework.response import Response
+   from rest_framework import status
+   from .models import Example
+   from .serializers import ExampleSerializer
+
+   class ExampleAPIView(APIView):
+       def get(self, request):
+           examples = Example.objects.all()
+           serializer = ExampleSerializer(examples, many=True)
+           return Response(serializer.data)
+
+       def post(self, request):
+           serializer = ExampleSerializer(data=request.data)
+           if serializer.is_valid():
+               serializer.save()
+               return Response(serializer.data, status=status.HTTP_201_CREATED)
+           return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+   ```
+
+5. **Define URLs** (`urls.py`):
+   ```python
+   from django.urls import path
+   from .views import ExampleAPIView
+
+   urlpatterns = [
+       path('api/examples/', ExampleAPIView.as_view(), name='example-api'),
+   ]
+   ```
+
+6. **Test the API**:
+   - Run the server:
+     ```bash
+     python manage.py runserver
+     ```
+   - Access the API at `http://127.0.0.1:8000/api/examples/`.
+
+---
+
+## Using Viewsets and Routers
+
+1. **Update Views** (`views.py`):
+   ```python
+   from rest_framework.viewsets import ModelViewSet
+   from .models import Example
+   from .serializers import ExampleSerializer
+
+   class ExampleViewSet(ModelViewSet):
+       queryset = Example.objects.all()
+       serializer_class = ExampleSerializer
+   ```
+
+2. **Add Routers** (`urls.py`):
+   ```python
+   from rest_framework.routers import DefaultRouter
+   from .views import ExampleViewSet
+
+   router = DefaultRouter()
+   router.register(r'api/examples', ExampleViewSet, basename='example')
+
+   urlpatterns = router.urls
+   ```
+
+---
+
+## Authentication and Permissions
+
+1. **Set Default Permissions** in `settings.py`:
+   ```python
+   REST_FRAMEWORK = {
+       'DEFAULT_PERMISSION_CLASSES': [
+           'rest_framework.permissions.IsAuthenticated',
+       ]
+   }
+   ```
+
+2. **Add Authentication to API**:
+   ```bash
+   pip install djangorestframework-simplejwt
+   ```
+   Update `settings.py`:
+   ```python
+   REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] = (
+       'rest_framework_simplejwt.authentication.JWTAuthentication',
+   )
+   ```
+
+3. **Add Login URLs**:
+   ```python
+   from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+   urlpatterns += [
+       path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+       path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+   ]
+   ```
+
+---
+
+## Advanced Topics
+
+### Pagination
+Add Pagination in `settings.py`:
+```python
+REST_FRAMEWORK['DEFAULT_PAGINATION_CLASS'] = 'rest_framework.pagination.PageNumberPagination'
+REST_FRAMEWORK['PAGE_SIZE'] = 10
+```
+
+### Filtering
+Install Django Filter:
+```bash
+pip install django-filter
+```
+Add Filtering to `settings.py`:
+```python
+REST_FRAMEWORK['DEFAULT_FILTER_BACKENDS'] = ['django_filters.rest_framework.DjangoFilterBackend']
+```
+Define Filters in Views:
+```python
+from django_filters.rest_framework import DjangoFilterBackend
+
+class ExampleViewSet(ModelViewSet):
+    queryset = Example.objects.all()
+    serializer_class = ExampleSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name']
+```
+
+---
+
+## Deployment
+
+1. **Install Gunicorn**:
+   ```bash
+   pip install gunicorn
+   ```
+2. **Run Gunicorn**:
+   ```bash
+   gunicorn project_name.wsgi:application
+   ```
+3. **Configure Web Server** (e.g., Nginx).
+
+---

@@ -1,0 +1,397 @@
+# Laravel Project Setup Guide
+---
+## Table of Contents
+1. [Global Installation of Laravel Installer](#1-global-installation-of-laravel-installer)
+2. [Create a New Laravel Project](#2-create-a-new-laravel-project)
+3. [Set Up Authentication](#3-set-up-authentication)
+   - [a. Install Laravel Breeze (Simple Authentication)](#a-install-laravel-breeze-simple-authentication)
+   - [b. Install Laravel Jetstream (Advanced Authentication with Teams)](#b-install-laravel-jetstream-advanced-authentication-with-teams)
+4. [Database Setup](#4-database-setup)
+5. [Setting Up Migrations, Models, and Controllers](#5-setting-up-migrations-models-and-controllers)
+6. [Install Spatie for Roles and Permissions](#6-install-spatie-for-roles-and-permissions)
+   - [a. Install Spatie Package](#a-install-spatie-package)
+   - [b. Publish Configuration](#b-publish-configuration)
+   - [c. Add HasRoles Trait](#c-add-hasroles-trait)
+   - [d. Seed Roles and Permissions](#d-seed-roles-and-permissions)
+7. [Setting Up Socialite for Social Logins](#7-setting-up-socialite-for-social-logins)
+   - [a. Install Socialite](#a-install-socialite)
+   - [b. Configure Providers](#b-configure-providers)
+   - [c. Create Authentication Routes](#c-create-authentication-routes)
+   - [d. Create Controller](#d-create-controller)
+8. [Event and Listener Setup](#8-event-and-listener-setup)
+   - [a. Create an Event](#a-create-an-event)
+   - [b. Create a Listener](#b-create-a-listener)
+   - [c. Register Events and Listeners](#c-register-events-and-listeners)
+   - [d. Dispatch an Event](#d-dispatch-an-event)
+9. [Queues and Jobs](#9-queues-and-jobs)
+   - [a. Set Up a Queue](#a-set-up-a-queue)
+   - [b. Create a Job](#b-create-a-job)
+   - [c. Dispatch a Job](#c-dispatch-a-job)
+   - [d. Process Queue](#d-process-queue)
+10. [Scaffolding](#10-scaffolding)
+    - [a. Request](#a-request)
+    - [b. Resource](#b-resource)
+    - [c. Policy](#c-policy)
+11. [Clear Cache](#11-clear-cache)
+
+--- 
+## 1. **Global Installation of Laravel Installer**
+Before starting any Laravel project, globally install the Laravel Installer if not already installed.
+
+```bash
+composer global require laravel/installer
+```
+
+Add the Composer global binaries directory to your system's `PATH` if needed.
+
+---
+
+## 2. **Create a New Laravel Project**
+Generate a new Laravel application.
+
+```bash
+laravel new project-name
+```
+
+Alternatively, use Composer:
+
+```bash
+composer create-project --prefer-dist laravel/laravel project-name
+```
+
+Navigate to the project directory:
+```bash
+cd project-name
+```
+
+---
+
+## 3. **Set Up Authentication**
+
+### a. Install Laravel Breeze (Simple Authentication):
+
+```bash
+composer require laravel/breeze --dev
+php artisan breeze:install
+```
+
+### b. Install Laravel Jetstream (Advanced Authentication with Teams):
+
+```bash
+composer require laravel/jetstream
+```
+
+For Livewire:
+```bash
+php artisan jetstream:install livewire
+```
+
+For Inertia.js:
+```bash
+php artisan jetstream:install inertia
+```
+
+Run the migrations:
+```bash
+php artisan migrate
+```
+
+Install frontend assets:
+```bash
+npm install && npm run dev
+```
+
+---
+
+## 4. **Database Setup**
+
+Configure your `.env` file to connect to your database:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database_name
+DB_USERNAME=your_database_user
+DB_PASSWORD=your_database_password
+```
+
+Run the migrations:
+```bash
+php artisan migrate
+```
+
+---
+
+## 5. **Setting Up Migrations, Models, and Controllers**
+Create migrations, models, and controllers in one step:
+
+```bash
+php artisan make:model ModelName -mcr
+```
+
+This generates:
+- A **Model**: `app/Models/ModelName.php`
+- A **Migration**: `database/migrations/xxxx_xx_xx_xxxxxx_create_model_name_table.php`
+- A **Controller**: `app/Http/Controllers/ModelNameController.php`
+
+Example:
+```bash
+php artisan make:model Flight -mcr
+```
+
+---
+
+## 6. **Install Spatie for Roles and Permissions**
+
+### a. Install Spatie Package:
+
+```bash
+composer require spatie/laravel-permission
+```
+
+### b. Publish Configuration:
+
+```bash
+php artisan vendor:publish --provider="Spatie\\Permission\\PermissionServiceProvider"
+```
+
+Run the migrations:
+```bash
+php artisan migrate
+```
+
+### c. Add `HasRoles` Trait:
+In the `User` model (`app/Models/User.php`), add:
+
+```php
+use Spatie\Permission\Traits\HasRoles;
+
+class User extends Authenticatable
+{
+    use HasRoles;
+}
+```
+
+### d. Seed Roles and Permissions:
+
+Create a seeder:
+```bash
+php artisan make:seeder RolesAndPermissionsSeeder
+```
+
+Update the seeder:
+
+```php
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+
+class RolesAndPermissionsSeeder extends Seeder
+{
+    public function run()
+    {
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        Permission::create(['name' => 'edit articles']);
+        Permission::create(['name' => 'delete articles']);
+        Permission::create(['name' => 'publish articles']);
+
+        $role = Role::create(['name' => 'writer']);
+        $role->givePermissionTo(['edit articles', 'delete articles']);
+
+        $adminRole = Role::create(['name' => 'admin']);
+        $adminRole->givePermissionTo(Permission::all());
+    }
+}
+```
+
+Run the seeder:
+```bash
+php artisan db:seed --class=RolesAndPermissionsSeeder
+```
+
+---
+
+## 7. **Setting Up Socialite for Social Logins**
+
+### a. Install Socialite:
+
+```bash
+composer require laravel/socialite
+```
+
+### b. Configure Providers:
+Add credentials in the `.env` file:
+
+```env
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URL=http://your-app-url.com/auth/google/callback
+```
+
+Update `config/services.php`:
+
+```php
+return [
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URL'),
+    ],
+];
+```
+
+### c. Create Authentication Routes:
+
+Add the routes in `routes/web.php`:
+
+```php
+use App\Http\Controllers\SocialAuthController;
+
+Route::get('auth/{provider}', [SocialAuthController::class, 'redirectToProvider']);
+Route::get('auth/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback']);
+```
+
+### d. Create Controller:
+
+```bash
+php artisan make:controller SocialAuthController
+```
+
+Add the methods:
+
+```php
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+
+public function redirectToProvider($provider)
+{
+    return Socialite::driver($provider)->redirect();
+}
+
+public function handleProviderCallback($provider)
+{
+    $socialUser = Socialite::driver($provider)->user();
+
+    $user = User::firstOrCreate(
+        ['email' => $socialUser->getEmail()],
+        [
+            'name' => $socialUser->getName(),
+            'provider_id' => $socialUser->getId(),
+            'avatar' => $socialUser->getAvatar(),
+        ]
+    );
+
+    Auth::login($user, true);
+
+    return redirect('/home');
+}
+```
+
+---
+
+## 8. **Event and Listener Setup**
+
+### a. Create an Event:
+
+```bash
+php artisan make:event EventName
+```
+
+### b. Create a Listener:
+
+```bash
+php artisan make:listener ListenerName --event=EventName
+```
+
+### c. Register Events and Listeners:
+In `app/Providers/EventServiceProvider.php`:
+
+```php
+protected $listen = [
+    \App\Events\EventName::class => [
+        \App\Listeners\ListenerName::class,
+    ],
+];
+```
+
+### d. Dispatch an Event:
+
+```php
+use App\Events\EventName;
+
+EventName::dispatch($data);
+```
+
+---
+
+## 9. **Queues and Jobs**
+
+### a. Set Up a Queue:
+Configure your `.env` file:
+
+```env
+QUEUE_CONNECTION=database
+```
+
+Run the queue table migration:
+```bash
+php artisan queue:table
+php artisan migrate
+```
+
+### b. Create a Job:
+
+```bash
+php artisan make:job JobName
+```
+
+### c. Dispatch a Job:
+
+```php
+use App\Jobs\JobName;
+
+JobName::dispatch($data);
+```
+
+### d. Process Queue:
+
+```bash
+php artisan queue:work
+```
+
+---
+
+## 10. **Scaffolding**
+
+Generate scaffolding for various components:
+
+- **Request**:
+  ```bash
+  php artisan make:request RequestName
+  ```
+
+- **Resource**:
+  ```bash
+  php artisan make:resource ResourceName
+  ```
+
+- **Policy**:
+  ```bash
+  php artisan make:policy PolicyName --model=ModelName
+  ```
+
+---
+
+## 11. **Clear Cache**
+Whenever you make changes to roles, permissions, or configurations, clear the cache:
+
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan permission:cache-reset
+```
+
+---
+

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="shortcut icon"
+      href="https://darpanadhikari.com.np/addition/images/darpan.png"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="./assets/css/readme.css">
+    <title>Mero Documentation</title>
+  </head>
+  <body>
+    <ul class="button-list">
+      <li
+        class="button laravel"
+        id="laravel" style="--bg-color:#ff4a45;"
+        onclick="readReameFile('./assets/readme/laravel.txt')"
+      >
+        Laravel
+      </li>
+      <li class="button django" style="--bg-color: #092e20;" onclick="readReameFile('./assets/readme/django.txt')">
+        Django
+      </li>
+      <li
+        onclick="document.getElementById('fileInput').click()"
+        class="button device" style="--bg-color:#3b5b8d;"
+      >
+        Device Readme
+      </li>
+    </ul>
+    <input type="file" id="fileInput" accept=".md" hidden />
+    <div id="output"></div>
+    <div class="scroll-top">
+      <span class="top">^</span>
+    </div>
+    <footer>
+      <span
+        ><i>&copy;</i><span id="date"></span
+        ><a href="https://darpanadhikari.com.np" target="_blank">
+          DarpanAdhikari</a
+        >
+        || All right reserved</span
+      >
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="./assets/js/readme.js"></script>
+  </body>
+</html>
