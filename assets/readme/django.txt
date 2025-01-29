@@ -132,18 +132,26 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 ```
+Update `urls.py` to serve media files during development:
+  ```python
+  from django.conf import settings
+  from django.conf.urls.static import static
+
+  if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+  ```
 
 Collect static files:
-```bash
-python manage.py collectstatic
-```
+  ```bash
+  python manage.py collectstatic
+  ```
 
 ### b. Media Files
 Set up media files in `settings.py`:
-```python
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-```
+  ```python
+  MEDIA_URL = '/media/'
+  MEDIA_ROOT = BASE_DIR / 'media'
+  ```
 
 Update `urls.py` to serve media files during development:
 ```python
@@ -183,7 +191,15 @@ if settings.DEBUG:
   {% bootstrap_css %}
   {% bootstrap_javascript %}
   ```
-- Add `'bootstrap5'` to `INSTALLED_APPS`.
+- Add `'bootstrap5'` to `INSTALLED_APPS`:
+Open settings.py and add 'bootstrap5' to the INSTALLED_APPS list:
+ ```python
+   INSTALLED_APPS = [
+    ...
+    'bootstrap5',
+    ...
+  ]
+ ```
 - Or, use a CDN in your base template:
   ```html
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
