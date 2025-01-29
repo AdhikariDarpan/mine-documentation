@@ -124,7 +124,7 @@
 ---
 
 ## Static File Management
-### 1 Static and Media Files
+### 1. Static and Media Files
 
 ### a. Static Files
 Configure static files in `settings.py`:
