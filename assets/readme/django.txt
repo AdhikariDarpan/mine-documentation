@@ -34,7 +34,7 @@
    - [8.1 QR Code Generation](#a-qr-code-generation)
    - [8.2 QR Manipulation](#b-qr-manipulation)
 
-9. [Model Setup & Relationships](#13-model-setup--relationships)
+9. [Model Setup and Relationships](#13-model-setup-and-relationships)
 
 10. [Form Creation and Methods](#14-form-creation-and-methods)
 
@@ -430,7 +430,7 @@ img.save('resized_qr_code.png')
 
 ---
 
-## 13. Model Setup & Relationships
+## 13. Model Setup and Relationships
 
 Django models allow you to define the structure of your database tables. You can set up relationships between models using `ForeignKey`, `OneToOneField`, and `ManyToManyField`.
 
