@@ -4,8 +4,8 @@
 1. [Global Installation of Laravel Installer](#1-global-installation-of-laravel-installer)
 2. [Create a New Laravel Project](#2-create-a-new-laravel-project)
 3. [Set Up Authentication](#3-set-up-authentication)
-   - [a. Install Laravel Breeze (Simple Authentication)](#a-install-laravel-breeze-simple-authentication)
-   - [b. Install Laravel Jetstream (Advanced Authentication with Teams)](#b-install-laravel-jetstream-advanced-authentication-with-teams)
+   - [a. Install Laravel Breeze](#a-install-laravel-breeze)
+   - [b. Install Laravel Jetstream](#b-install-laravel-jetstream)
 4. [Database Setup](#4-database-setup)
 5. [Setting Up Migrations, Models, and Controllers](#5-setting-up-migrations-models-and-controllers)
 6. [Install Spatie for Roles and Permissions](#6-install-spatie-for-roles-and-permissions)
@@ -68,14 +68,14 @@ cd project-name
 
 ## 3. **Set Up Authentication**
 
-### a. Install Laravel Breeze (Simple Authentication):
+### a. Install Laravel Breeze:
 
 ```bash
 composer require laravel/breeze --dev
 php artisan breeze:install
 ```
 
-### b. Install Laravel Jetstream (Advanced Authentication with Teams):
+### b. Install Laravel Jetstream:
 
 ```bash
 composer require laravel/jetstream
