@@ -85,9 +85,9 @@
   DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'college_project',
+        'NAME': 'Database_name',
         'USER' : 'root',
-        'PASSWORD' : '',
+        'PASSWORD' : 'password',
         'HOST' : 'localhost',
         'PORT' : '3306',
     }
@@ -517,7 +517,7 @@ class CourseForm(forms.ModelForm):
 
 ---
 
-## 15. Social Authentication (Socialite Integration)
+## 15. Social Authentication Socialite Integration
 
 Social authentication allows users to sign in using their accounts from third-party services such as Google, Facebook, or GitHub.
 
@@ -571,7 +571,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'your-client-secret'
 
 ---
 
-## 16. Multi-Language Project Setup
+## 16. Multi Language Project Setup
 
 Django supports multi-language projects through its **Internationalization (i18n)** system.
 
