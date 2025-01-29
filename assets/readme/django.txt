@@ -30,7 +30,7 @@
 
 7. [Testing](#testing)
 
-8. [QR Code Generation & Manipulation](#12-qr-code-generation--manipulation)
+8. [QR Code Generation and Manipulation](#12-qr-code-generation-and-manipulation)
    - [8.1 QR Code Generation](#a-qr-code-generation)
    - [8.2 QR Manipulation](#b-qr-manipulation)
 
@@ -385,7 +385,7 @@ When deploying to production, build Tailwind CSS using the following command:
 
 ---
 
-## 12. QR Code Generation & Manipulation
+## 12. QR Code Generation and Manipulation
 
 ### a. QR Code Generation
 You can generate QR codes using the `qrcode` library. This is useful for encoding URLs, user information, or any other type of data into a scannable QR code.
