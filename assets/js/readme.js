@@ -51,7 +51,7 @@ function filterLinks(htmlContent) {
       .forEach((heading) => {
         const headingText = heading.textContent.trim().toLowerCase();
         const searchText = content.trim().toLowerCase();
-        if (headingText.includes(searchText)) {
+        if (!heading.id && headingText.includes(searchText)) {
           heading.id = element.replace(/[#]/g, "");
         }
       });
