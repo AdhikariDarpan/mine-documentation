@@ -1,0 +1,299 @@
+# Flutter Mobile App Development Guide  
+**Comprehensive Documentation for Android and iOS Apps**  
+
+[![Flutter](https://img.shields.io/badge/Flutter-3.13.9-blue)](https://flutter.dev)  
+[![Platforms](https://img.shields.io/badge/Platforms-Android%20%7C%20iOS-brightgreen)](https://flutter.dev) 
+
+---
+
+## Table of Contents  
+1. [Environment Setup](#environment-setup)  
+2. [Creating a Project](#creating-a-project)  
+3. [UI Development](#ui-development)  
+4. [Authentication and Sessions](#authentication-and-sessions)  
+5. [Navigation and Links](#navigation-and-links)  
+6. [Animations](#animations)  
+7. [State Management](#state-management)  
+8. [Testing](#testing)  
+9. [Deployment](#deployment)  
+10. [Future Updates](#future-updates)  
+11. [FAQ](#faq)  
+
+---
+
+## 1. Environment Setup  
+### 1.1 Install Flutter SDK  
+**All OS**:  
+```bash  
+# Download from https://flutter.dev  
+# Extract and add to PATH  
+# Verify installation  
+flutter doctor  
+```  
+
+**Windows**:  
+- Install Visual Studio for C++ tools.  
+
+**macOS**:  
+- Install Xcode via App Store.  
+```bash  
+sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer  
+```  
+
+**Linux**:  
+```bash  
+sudo apt-get install clang cmake ninja-build pkg-config libgtk-3-dev  
+```  
+
+### 1.2 IDE Setup  
+- **VS Code**: Install Flutter and Dart extensions.  
+- **Android Studio**: Install Flutter and Dart plugins.  
+
+---
+
+## 2. Creating a Project  
+```bash  
+flutter create my_app  
+cd my_app  
+flutter run  # Launch on connected device/emulator  
+```  
+
+**Project Structure**:  
+```  
+my_app/  
+├── android/          # Android config  
+├── ios/              # iOS config (macOS only)  
+├── lib/              # Dart code  
+│   └── main.dart     # Entry point  
+├── test/             # Tests  
+└── pubspec.yaml      # Dependencies  
+```  
+
+---
+
+## 3. UI Development  
+### 3.1 Basic Widgets  
+```dart  
+// Stateless Widget  
+Scaffold(  
+  appBar: AppBar(title: Text('Home')),  
+  body: Center(child: Text('Hello World')),  
+);  
+```  
+
+### 3.2 Platform-Specific UI  
+```dart  
+import 'dart:io';  
+
+Widget getButton() {  
+  if (Platform.isAndroid) {  
+    return MaterialButton(...);  
+  } else {  
+    return CupertinoButton(...);  
+  }  
+}  
+```  
+
+---
+
+## 4. Authentication and Sessions  
+### 4.1 Token Management  
+**pubspec.yaml**:  
+```yaml  
+dependencies:  
+  flutter_secure_storage: ^8.0.0  
+```  
+
+**Save Token**:  
+```dart  
+const storage = FlutterSecureStorage();  
+await storage.write(key: 'auth_token', value: 'YOUR_JWT');  
+```  
+
+**Attach to Requests**:  
+```dart  
+final token = await storage.read(key: 'auth_token');  
+final response = await http.get(  
+  Uri.parse('https://api.example.com/data'),  
+  headers: {'Authorization': 'Bearer $token'},  
+);  
+```  
+
+### 4.2 Auto-Logout on Session Expiry  
+```dart  
+dio.interceptors.add(  
+  InterceptorsWrapper(  
+    onError: (error) {  
+      if (error.response?.statusCode == 401) {  
+        Navigator.pushReplacementNamed(context, '/login');  
+      }  
+    },  
+  ),  
+);  
+```  
+
+---
+
+## 5. Navigation and Links  
+### 5.1 In-App vs Browser Navigation  
+```dart  
+void handleLink(String url) {  
+  final uri = Uri.parse(url);  
+  if (uri.host == 'yourdomain.com') {  
+    Navigator.push(context, MaterialPageRoute(builder: (_) => InternalPage()));  
+  } else {  
+    launchUrl(Uri.parse(url));  // Requires url_launcher  
+  }  
+}  
+```  
+
+### 5.2 Deep Linking  
+**Android**: Add to `AndroidManifest.xml`:  
+```xml  
+<intent-filter>  
+  <action android:name="android.intent.action.VIEW" />  
+  <data android:scheme="myapp" android:host="profile" />  
+</intent-filter>  
+```  
+
+**iOS**: Configure in Xcode → Info → URL Types.  
+
+---
+
+## 6. Animations  
+### 6.1 Loading Spinner  
+```dart  
+Center(child: CircularProgressIndicator());  
+```  
+
+### 6.2 Lottie Animations  
+**pubspec.yaml**:  
+```yaml  
+dependencies:  
+  lottie: ^2.7.0  
+```  
+
+**Usage**:  
+```dart  
+Lottie.asset('assets/loading.json');  
+```  
+
+### 6.3 Custom Page Transitions  
+```dart  
+Navigator.push(  
+  context,  
+  PageRouteBuilder(  
+    transitionsBuilder: (_, animation, __, child) =>  
+      FadeTransition(opacity: animation, child: child),  
+  ),  
+);  
+```  
+
+---
+
+## 7. State Management  
+### 7.1 Riverpod  
+```dart  
+final counterProvider = StateNotifierProvider<Counter, int>((ref) => Counter());  
+
+class Counter extends StateNotifier<int> {  
+  Counter() : super(0);  
+  void increment() => state++;  
+}  
+```  
+
+### 7.2 Bloc/Cubit  
+```dart  
+class CounterCubit extends Cubit<int> {  
+  CounterCubit() : super(0);  
+  void increment() => emit(state + 1);  
+}  
+```  
+
+---
+
+## 8. Testing  
+### 8.1 Unit Test  
+```dart  
+test('Counter increments', () {  
+  expect(Counter().increment(), 1);  
+});  
+```  
+
+### 8.2 Integration Test  
+```dart  
+testWidgets('Login Test', (tester) async {  
+  await tester.pumpWidget(MyApp());  
+  await tester.tap(find.byType(LoginButton));  
+  await tester.pumpAndSettle();  
+  expect(find.text('Welcome'), findsOneWidget);  
+});  
+```  
+
+---
+
+## 9. Deployment  
+### 9.1 Android  
+```bash  
+flutter build appbundle --release  # Generate app bundle  
+# Sign with keystore (Windows/macOS/Linux)  
+keytool -genkey -v -keystore ~/key.jks -alias key -keyalg RSA -keysize 2048  
+```  
+
+### 9.2 iOS (macOS only)  
+```bash  
+flutter build ipa --release  # Generate IPA  
+# Distribute via Xcode → Window → Organizer  
+```  
+
+---
+
+## 10. Future Updates  
+### 10.1 In-App Updates  
+**Android**:  
+```yaml  
+dependencies:  
+  in_app_update: ^3.0.3  
+```  
+
+**iOS**: Redirect to App Store:  
+```dart  
+launchUrl(Uri.parse('https://apps.apple.com/app/idYOUR_APP_ID'));  
+```  
+
+### 10.2 Version Control and CI/CD  
+**Git Flow**:  
+```bash  
+git checkout -b feature/new-login  
+git commit -m "Add new login flow"  
+git push origin feature/new-login  
+```  
+
+**GitHub Actions**:  
+```yaml  
+jobs:  
+  build:  
+    runs-on: ubuntu-latest  
+    steps:  
+      - uses: actions/checkout@v3  
+      - uses: subosito/flutter-action@v2  
+      - run: flutter build apk --release  
+```  
+
+---
+
+## 11. FAQ  
+**Q: How to resolve dependency conflicts?**  
+```bash  
+flutter clean andand flutter pub get  
+```  
+
+**Q: App crashes on launch?**  
+- Ensure all `pubspec.yaml` dependencies are compatible.  
+- Check device logs with `flutter logs`.  
+
+**Q: Build errors on iOS?**  
+```bash  
+cd ios  
+pod install --repo-update  
+```  
