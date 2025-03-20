@@ -79,7 +79,8 @@ function showCopyBtn(){
     button.classList.add('copy-btn');
     button.textContent = '📋 Copy';
     const codeText = pre.querySelector('code').textContent.trim();
-    let codeType = pre.querySelector('code').getAttribute('class').split('-')[1];
+    let codeElement = pre.querySelector('code');
+    let codeType = codeElement?.getAttribute('class')?.includes('-') ? codeElement.getAttribute('class').split('-')[1] : null;
     codeType = (codeType == 'bash')?'comand':codeType;
     pre.querySelector('code').style.setProperty("--text", `"${codeType}"`);
     button.addEventListener('click', () => {
